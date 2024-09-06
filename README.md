@@ -1,6 +1,8 @@
 # Image Storage Webservice API
 To-Do:
-Deployment Plan on aws EKS
+1. Add DOCKERFILE
+2. Deployment Plan on aws EKS
+3. Automate depoyment on aws using Teraform
 
 ### Overview
 
