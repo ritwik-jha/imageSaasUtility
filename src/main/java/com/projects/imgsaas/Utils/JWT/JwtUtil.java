@@ -5,40 +5,66 @@ package com.projects.imgsaas.Utils.JWT;
 // import io.jsonwebtoken.Claims;
 
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 import java.util.Base64;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 @Component
 public class JwtUtil {
 
     private final String secretKey = "mysecretkey";
+    private final long tokenValidityInMilliseconds = 60 * 60 * 1000;
 
-    public String generateJwtToken(String email){
-        LocalDateTime localDateTime = LocalDateTime.now();
+    public String generateJwtToken(String email) throws Exception {
+        long currTime = System.currentTimeMillis();
+        long expiryTime = System.currentTimeMillis() + tokenValidityInMilliseconds;
 
-        String decodedToken = email + "?" + localDateTime.toString() + "?" + secretKey;
-        String encodedString = Base64.getEncoder().encodeToString(decodedToken.getBytes());
+        String header = Base64.getEncoder().encodeToString("{\"alg\":\"HS256\",\"typ\":\"JWT\"}".getBytes());
+        String payloadInString = "{\"sub\":\"" + email + "\",\"iat\":" + currTime / 1000 + ",\"exp\":" + expiryTime / 1000 + "}";
+        String payload = Base64.getEncoder().encodeToString(payloadInString.getBytes());
 
-        return encodedString;
-    }
-    public String decodeToken(String token){
-        return new String(Base64.getDecoder().decode(token));
-    }
+        String signaure = generateHMAC(header + "." + payload, secretKey);
 
-    public boolean validateToken(String token, String username) {
-        String[] tokenArray = decodeToken(token).split("\\?");
-        String tokenUsername = tokenArray[0];
-        return (username.equals(tokenUsername) && !isTokenExpired(token));
+        return header + "." + payload + "." + signaure;
     }
 
-    public boolean isTokenExpired(String token) {
-        String[] tokenArray = decodeToken(token).split("\\?");
-        String tokenDateTimeString = tokenArray[1];
-        LocalDateTime tokenDateTime = LocalDateTime.parse(tokenDateTimeString);
-        LocalDateTime nowTime = LocalDateTime.now();
+    public boolean validateToken(String token, String email) throws Exception {
+        String[] tokenArray = token.split("\\.");
 
-        return tokenDateTime.isBefore(nowTime.minusHours(1));
+        if(tokenArray.length != 3){
+            return false;
+        }
+
+        String header = tokenArray[0];
+        String payload = tokenArray[1];
+        String signature = tokenArray[2];
+
+        String expectedSignature = generateHMAC(header + "." + payload, secretKey);
+
+        if(!signature.equals(expectedSignature)){
+            return false;
+        }
+
+        String payloadJson = new String(Base64.getUrlDecoder().decode(payload));
+        String emailFromPayload = payloadJson.replaceAll(".*\"sub\":\"(.*?)\".*", "$1");
+        long exp = Long.parseLong(payloadJson.replaceAll(".*\"exp\":(\\d+).*", "$1"));
+
+        if(!email.equals(emailFromPayload) || exp < System.currentTimeMillis()){
+            return false;
+        }
+
+        return true;
+
     }
+
+    private static String generateHMAC(String data, String key) throws Exception {
+        Mac hmac = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(), "HmacSHA256");
+        hmac.init(secretKeySpec);
+        byte[] hash = hmac.doFinal(data.getBytes());
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
+    }
+
 
 }

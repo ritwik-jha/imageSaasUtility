@@ -28,7 +28,7 @@ public class ImageController {
 
 
     @PostMapping("/upload")
-    public ResponseEntity<ResponseVO> uploadImage (@RequestParam MultipartFile file, @RequestHeader("Authorization") String authorizationHeader, @RequestParam String email) {
+    public ResponseEntity<ResponseVO> uploadImage (@RequestParam MultipartFile file, @RequestHeader("Authorization") String authorizationHeader, @RequestParam String email) throws Exception {
         // details needed from user
         // 1. token 
         // 2. email 
@@ -46,9 +46,9 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseVO(false, "Email id not provided", null));
         }
 
-        if(jwtUtil.isTokenExpired(jwtToken)){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "Token expired, login again", null));
-        }
+        // if(jwtUtil.isTokenExpired(jwtToken)){
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "Token expired, login again", null));
+        // }
 
         if(!jwtUtil.validateToken(jwtToken, email)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "Authorization failed", null));
@@ -69,7 +69,7 @@ public class ImageController {
     }
 
     @GetMapping("/get/all")
-    public ResponseEntity<ResponseVO> getAllImages(@RequestHeader("Authorization") String authorizationHeader, @RequestParam String email){
+    public ResponseEntity<ResponseVO> getAllImages(@RequestHeader("Authorization") String authorizationHeader, @RequestParam String email) throws Exception{
         if(authorizationHeader == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "No Authorization header", null));
         }
@@ -83,9 +83,9 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseVO(false, "Email id not provided", null));
         }
 
-        if(jwtUtil.isTokenExpired(jwtToken)){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "Token expired, login again", null));
-        }
+        // if(jwtUtil.isTokenExpired(jwtToken)){
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "Token expired, login again", null));
+        // }
 
         if(!jwtUtil.validateToken(jwtToken, email)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "Authorization failed", null));
@@ -101,7 +101,7 @@ public class ImageController {
     }
 
     @GetMapping("/get/one")
-    public ResponseEntity<ResponseVO> getOneImage(@RequestHeader("Authorization") String authorizationHeader, @RequestParam String email, @RequestParam String imageName){
+    public ResponseEntity<ResponseVO> getOneImage(@RequestHeader("Authorization") String authorizationHeader, @RequestParam String email, @RequestParam String imageName) throws Exception{
         if(authorizationHeader == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "No Authorization header", null));
         }
@@ -115,9 +115,9 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseVO(false, "Email id not provided", null));
         }
 
-        if(jwtUtil.isTokenExpired(jwtToken)){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "Token expired, login again", null));
-        }
+        // if(jwtUtil.isTokenExpired(jwtToken)){
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "Token expired, login again", null));
+        // }
 
         if(!jwtUtil.validateToken(jwtToken, email)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "Authorization failed", null));
@@ -133,7 +133,7 @@ public class ImageController {
     }
 
     @GetMapping("/delete/one")
-    public ResponseEntity<ResponseVO> deleteImage(@RequestHeader("Authorization") String authorizationHeader, @RequestParam String email, @RequestParam String imageName){
+    public ResponseEntity<ResponseVO> deleteImage(@RequestHeader("Authorization") String authorizationHeader, @RequestParam String email, @RequestParam String imageName) throws Exception{
         if(authorizationHeader == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "No Authorization header", null));
         }
@@ -147,9 +147,9 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseVO(false, "Email id not provided", null));
         }
 
-        if(jwtUtil.isTokenExpired(jwtToken)){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "Token expired, login again", null));
-        }
+        // if(jwtUtil.isTokenExpired(jwtToken)){
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "Token expired, login again", null));
+        // }
 
         if(!jwtUtil.validateToken(jwtToken, email)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseVO(false, "Authorization failed", null));
